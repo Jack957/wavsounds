@@ -20,17 +20,20 @@ using namespace little_endian_io;
 int main()
 {
   ofstream f( "example48khz.wav", ios::binary );
-  const int sampleRate = 48000;
+  int sampleRate = 48000;
+  int chnum = 2;
+  int bitspersample = 16;
+  double seconds = 5; // period of this sound
   
   // Write the file headers
   f << "RIFF----WAVEfmt ";     // (chunk size to be filled in later) Chunk ID = "RIFF" WAVEID = "fmt "
   write_word( f,     16, 4 );  // no extension data 	//chunk size
   write_word( f,      1, 2 );  // PCM - integer samples //Format code 1:PCM
-  write_word( f,      2, 2 );  // two channels (stereo file) //Number of interleaved channels
-  write_word( f,  sampleRate, 4 );  // samples per second (Hz)	// Sample rate
-  write_word( f, sampleRate*16*2/8, 4 );  // (Sample Rate * BitsPerSample * Channels) / 8   //data rate in bytes
+  write_word( f,  chnum, 2 );  // two channels (stereo file) //Number of interleaved channels
+  write_word( f, sampleRate, 4 );  // samples per second (Hz)	// Sample rate
+  write_word( f, sampleRate*16*chnum/8, 4 );  // (Sample Rate * BitsPerSample * Channels) / 8   //data rate in bytes
   write_word( f,      4, 2 );  // data block size (size of two integer samples, one for each channel, in bytes)
-  write_word( f,     16, 2 );  // number of bits per sample (use a multiple of 8)
+  write_word( f, bitspersample, 2 );  // number of bits per sample (use a multiple of 8)
 
   // Write the data chunk header
   size_t data_chunk_pos = f.tellp();
@@ -43,15 +46,14 @@ int main()
 
   double hz        = sampleRate;    // samples per second
   double frequency = 261.626;  // middle C
-  double seconds   = 2.5;      // time
-
+  
   int N = hz * seconds;  // total number of samples
   for (int n = 0; n < N; n++)
   {
     double amplitude = (double)n / N * max_amplitude;
     double value     = sin( (two_pi * n * frequency) / hz );
-    write_word( f, (int)(                 amplitude  * value), 2 );
-    write_word( f, (int)((max_amplitude - amplitude) * value), 2 );
+    write_word( f, (int)(                 amplitude  * value), 2 );//left channel <<
+    write_word( f, (int)((max_amplitude - amplitude) * value), 2 );//right channle >>
   }
   
   // (We'll need the final file size to fix the chunk sizes above)
