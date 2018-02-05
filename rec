@@ -1,0 +1,1 @@
+arecord -f S16_LE -c 1 -r48000 -t wav --max-file-time 300 --use-strftime %Y-%m-%d/listen-%H-%M-%S-%v.wav
