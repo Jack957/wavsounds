@@ -1,0 +1,1 @@
+speaker-test -c 1 -t sine -f 1000 -D plughw:Device,0

@@ -1,0 +1,2 @@
+arecord -D plughw:Device -d30 -fdat  -c1 -Vmono  ./test.wav
+# arecord -D plughw:1,0 -fdat -d30 -Vmono ./test.wav
